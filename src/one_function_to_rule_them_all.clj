@@ -67,7 +67,13 @@
   ([f] '())
   ([f & more] (loop [acc '()
                      seqs more] 
-                (if (empty? (first seqs)) (reverse acc)
-                  (recur
-                    (cons (apply f (map first seqs)) acc)
-                    (map rest seqs))))))
+                (cond
+                  ; any seqs empty? return
+                  (not (every? (fn [x] (not (empty? x))) seqs)) (reverse acc)
+                  (= 1 (count more)) (reverse (reduce
+                                                (fn [acc b] (cons (f b) acc))
+                                                '()
+                                                (first more)))
+                  :else (recur
+                          (cons (apply f (my-map first seqs)) acc)
+                          (my-map rest seqs))))))
